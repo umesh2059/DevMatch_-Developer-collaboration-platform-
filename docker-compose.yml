@@ -7,7 +7,11 @@ services:
       POSTGRES_PASSWORD: devmatch
       POSTGRES_DB: devmatch
     ports:
-      - "5432:5432"
+      # Host port 5434, not 5432: on some machines a native Postgres
+      # install (or another project's container) already owns 5432/5433,
+      # and IPv4 "localhost" connections silently reach that one instead of
+      # this container - see the port-collision note in IMPLEMENTATION.md.
+      - "5434:5432"
     volumes:
       - devmatch_db_data:/var/lib/postgresql/data
 

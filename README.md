@@ -15,7 +15,7 @@ this code.
 
 ```bash
 cp .env.example .env          # then edit SESSION_SECRET to something random
-docker compose up -d          # starts Postgres on localhost:5432
+docker compose up -d          # starts Postgres on localhost:5434
 npm run db:migrate            # creates tables
 npm run db:seed               # demo users, password: password123
 npm run dev                   # http://localhost:3000

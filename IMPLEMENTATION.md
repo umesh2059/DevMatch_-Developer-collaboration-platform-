@@ -245,7 +245,7 @@ sprawl:
 
 ```bash
 cp .env.example .env          # then edit SESSION_SECRET to something random
-docker compose up -d          # starts Postgres on localhost:5432
+docker compose up -d          # starts Postgres on localhost:5434
 npm run db:migrate            # creates tables (prompts for a migration name)
 npm run db:seed               # demo users: asha/marco/priya @example.com, password123
 npm run dev                   # boots the custom server (Next + Socket.IO) on :3000
@@ -254,20 +254,43 @@ npm run dev                   # boots the custom server (Next + Socket.IO) on :3
 Other scripts: `npm run db:studio` (Prisma Studio), `npm run build` /
 `npm run start` (production), `npm run lint`.
 
+### Port note: why 5434, not the default 5432
+
+`docker-compose.yml` publishes Postgres on host port **5434**, not the
+default 5432. On the machine this was built on, a native (non-Docker)
+PostgreSQL install already had `0.0.0.0:5432` bound, alongside Docker
+Desktop's own proxy listening on `[::]:5432` — same port, different address
+families, both technically "listening." IPv4 connections to
+`localhost:5432` (which is what Prisma/`pg` use) silently reached the
+*native* Postgres instead of the container, and failed with
+`P1000: Authentication failed`, which looked exactly like a bad password
+even though the container's credentials were correct. Diagnosed by checking
+`Get-NetTCPConnection -LocalPort 5432` and finding two owning processes. If
+you hit the same error on a fresh machine, check for a similar collision
+before assuming the credentials are wrong.
+
 ## Verification performed this session
 
-- `npx tsc --noEmit` — clean
-- `npx eslint .` — clean
-- `npx next build` — succeeds; every route correctly reports as dynamic
-  (`ƒ`), proxy is picked up
+- `npx tsc --noEmit`, `npx eslint .`, `npx next build` — all clean; every
+  route correctly reports as dynamic (`ƒ`), proxy is picked up
 - `npm run dev` (custom server) smoke-tested: `/`, `/login`, `/register`
-  return 200 with real content; unauthenticated `/dashboard` correctly
-  redirects (307) to `/login?next=%2Fdashboard`
-- **Not verified**: any flow that touches Postgres (register/login, project
-  CRUD, matching, tasks, chat persistence), because Docker Desktop's engine
-  wasn't running in this environment (`docker compose up` failed to reach
-  it) — the CLI is present but the daemon isn't. Once you have Postgres up
-  via `docker compose up -d`, run through: register → add skills on
-  `/profile` → post a project → register a second account → request to join
-  → accept → confirm `/teams/[id]` shows the task board and a live chat
-  message roundtrips between two browser sessions.
+  return 200; unauthenticated `/dashboard` correctly redirects (307) to
+  `/login?next=%2Fdashboard`
+- **With a live Postgres database** (migrated + seeded): `/projects` and
+  `/projects/[id]` render real rows from the database end-to-end through
+  the Prisma 7 driver adapter; the matching formula was run directly
+  against seeded data (Marco's skills vs. the seed project's required
+  skills → 77% — coverage 2/3 skills matched × 70 + avg depth 1.0 × 30,
+  matching the algorithm's documented weights by hand); password hashing
+  round-trips correctly (`bcrypt.compare` true for the right password,
+  false for a wrong one)
+- **Not verified**: the actual browser flows — submitting the login/register
+  forms, accepting a collaboration request, and the live chat roundtrip —
+  since React Server Actions encode a dynamic action reference into the
+  form that isn't practical to replay by hand with curl. The dev server is
+  left running at `http://localhost:3000`; log in as `asha@example.com`
+  (or `marco@example.com` / `priya@example.com`), password `password123`,
+  and click through: `/matches` (Marco or Priya should see the seeded
+  project ranked), request to join as one account, accept as Asha in
+  another browser/incognito session, then open `/teams/[id]` in both and
+  confirm a chat message sent from one appears in the other.
