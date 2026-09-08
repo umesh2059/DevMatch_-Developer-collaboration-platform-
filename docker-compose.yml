@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: devmatch
+      POSTGRES_PASSWORD: devmatch
+      POSTGRES_DB: devmatch
+    ports:
+      - "5432:5432"
+    volumes:
+      - devmatch_db_data:/var/lib/postgresql/data
+
+volumes:
+  devmatch_db_data:

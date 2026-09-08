@@ -1,0 +1,173 @@
+// DevMatch data model.
+// See IMPLEMENTATION.md for the full architecture write-up.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Prisma 7: the connection URL no longer lives here - it's supplied to the
+// CLI via prisma.config.ts, and to PrismaClient at runtime via a driver
+// adapter (see lib/prisma.ts).
+datasource db {
+  provider = "postgresql"
+}
+
+enum ProjectStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  ARCHIVED
+}
+
+enum RequestStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+enum TeamRole {
+  OWNER
+  MEMBER
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  bio          String?  @db.Text
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  skills             UserSkill[]
+  ownedProjects      Project[]               @relation("ProjectOwner")
+  collabRequests     CollaborationRequest[]  @relation("RequesterUser")
+  teamMemberships    TeamMember[]
+  assignedTasks      Task[]                  @relation("TaskAssignee")
+  messages           Message[]
+
+  @@index([email])
+}
+
+model Skill {
+  id       String @id @default(cuid())
+  name     String @unique
+  users    UserSkill[]
+  projects ProjectSkill[]
+}
+
+model UserSkill {
+  userId  String
+  skillId String
+  level   Int    @default(3) // 1 (learning) - 5 (expert)
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skill Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([userId, skillId])
+}
+
+model Project {
+  id          String        @id @default(cuid())
+  title       String
+  description String        @db.Text
+  status      ProjectStatus @default(OPEN)
+  ownerId     String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  owner    User                   @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  skills   ProjectSkill[]
+  requests CollaborationRequest[]
+  team     Team?
+
+  @@index([ownerId])
+  @@index([status])
+}
+
+model ProjectSkill {
+  projectId String
+  skillId   String
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  skill   Skill   @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@id([projectId, skillId])
+}
+
+model CollaborationRequest {
+  id          String        @id @default(cuid())
+  projectId   String
+  requesterId String
+  message     String?       @db.Text
+  status      RequestStatus @default(PENDING)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  requester User    @relation("RequesterUser", fields: [requesterId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, requesterId])
+  @@index([projectId])
+  @@index([requesterId])
+}
+
+model Team {
+  id        String   @id @default(cuid())
+  projectId String   @unique
+  createdAt DateTime @default(now())
+
+  project Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  members TeamMember[]
+  tasks   Task[]
+  messages Message[]
+}
+
+model TeamMember {
+  teamId   String
+  userId   String
+  role     TeamRole @default(MEMBER)
+  joinedAt DateTime @default(now())
+
+  team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([teamId, userId])
+  @@index([userId])
+}
+
+model Task {
+  id          String     @id @default(cuid())
+  teamId      String
+  title       String
+  description String?    @db.Text
+  status      TaskStatus @default(TODO)
+  assigneeId  String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  team     Team  @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  assignee User? @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+
+  @@index([teamId])
+  @@index([assigneeId])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  teamId    String
+  senderId  String
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+
+  team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  sender User @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([teamId, createdAt])
+}
