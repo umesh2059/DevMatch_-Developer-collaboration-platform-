@@ -48,7 +48,7 @@ async function main() {
     ],
   );
 
-  const marco = await upsertUserWithSkills(
+  await upsertUserWithSkills(
     "marco@example.com",
     "Marco Rossi",
     "Backend engineer, ex-fintech. Into distributed systems and coffee.",

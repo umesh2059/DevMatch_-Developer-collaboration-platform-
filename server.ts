@@ -4,7 +4,7 @@
 import { createServer } from "http";
 import next from "next";
 import { Server as SocketIOServer } from "socket.io";
-import { decryptSession, SESSION_COOKIE } from "./lib/session";
+import { decryptSession, SESSION_COOKIE } from "./lib/session-crypto";
 import { prisma } from "./lib/prisma";
 import { requireTeamMembership } from "./lib/teams";
 import type {

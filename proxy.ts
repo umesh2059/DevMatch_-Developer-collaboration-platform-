@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { decryptSession, SESSION_COOKIE } from "@/lib/session";
+import { decryptSession, SESSION_COOKIE } from "@/lib/session-crypto";
 
 const PROTECTED_PREFIXES = ["/dashboard", "/profile", "/projects/new", "/matches", "/teams"];
 const AUTH_ROUTES = ["/login", "/register"];
