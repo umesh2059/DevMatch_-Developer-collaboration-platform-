@@ -62,6 +62,8 @@ export default async function TeamWorkspacePage({ params }: PageProps<"/teams/[i
             title: t.title,
             description: t.description,
             status: t.status,
+            priority: t.priority,
+            dueDate: t.dueDate ? t.dueDate.toISOString() : null,
             assignee: t.assignee,
           }))}
           members={team.members.map((m) => m.user)}

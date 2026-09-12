@@ -11,12 +11,13 @@ async function upsertUserWithSkills(
   name: string,
   bio: string,
   skills: { name: string; level: number }[],
+  role: "USER" | "ADMIN" = "USER",
 ) {
   const passwordHash = await bcrypt.hash(DEMO_PASSWORD, 10);
   const user = await prisma.user.upsert({
     where: { email },
-    update: {},
-    create: { email, name, bio, passwordHash },
+    update: { role },
+    create: { email, name, bio, passwordHash, role },
   });
 
   for (const { name: skillName, level } of skills) {
@@ -71,6 +72,8 @@ async function main() {
     ],
   );
 
+  await upsertUserWithSkills("admin@example.com", "Admin User", "Platform admin.", [], "ADMIN");
+
   const project = await prisma.project.upsert({
     where: { id: "seed-project-devmatch-mobile" },
     update: {},
@@ -100,6 +103,7 @@ async function main() {
   console.log("Seed complete.");
   console.log(`Demo accounts (password: ${DEMO_PASSWORD}):`);
   console.log("  asha@example.com / marco@example.com / priya@example.com");
+  console.log("  admin@example.com (admin - has access to /admin)");
 }
 
 main()

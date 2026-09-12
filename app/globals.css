@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Manual light/dark toggle: dark: utilities respond to [data-theme="dark"]
+   on <html> (set by the inline script in app/layout.tsx) instead of the
+   prefers-color-scheme media query, so the user's choice always wins. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -12,11 +17,9 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+[data-theme="dark"] {
+  --background: #0a0a0a;
+  --foreground: #ededed;
 }
 
 body {

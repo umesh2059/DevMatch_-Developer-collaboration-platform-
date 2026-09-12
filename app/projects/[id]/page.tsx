@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getCandidatesForProject } from "@/lib/matching";
 import { JoinForm } from "./join-form";
 import { RespondButtons } from "./respond-buttons";
+import { ReportProjectForm } from "./report-form";
 
 export const dynamic = "force-dynamic";
 
@@ -83,6 +84,11 @@ export default async function ProjectDetailPage({ params }: PageProps<"/projects
           )}
           {user && !isMember && !myRequest && project.status === "OPEN" && (
             <JoinForm projectId={project.id} />
+          )}
+          {user && (
+            <div className="mt-6">
+              <ReportProjectForm projectId={project.id} />
+            </div>
           )}
         </div>
       )}

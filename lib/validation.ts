@@ -44,6 +44,18 @@ export const TaskSchema = z.object({
   title: z.string().trim().min(2, "Title must be at least 2 characters long."),
   description: z.string().trim().max(1000).optional(),
   assigneeId: z.string().optional(),
+  priority: z.enum(["LOW", "MEDIUM", "HIGH"]).default("MEDIUM"),
+  dueDate: z
+    .string()
+    .trim()
+    .refine((v) => v === "" || !Number.isNaN(Date.parse(v)), "Enter a valid due date.")
+    .optional(),
+});
+
+export const ReportSchema = z.object({
+  targetType: z.enum(["PROJECT", "MESSAGE"]),
+  targetId: z.string().min(1),
+  reason: z.string().trim().min(3, "Say a bit more about the issue.").max(500),
 });
 
 export const ChatRequestSchema = z.object({

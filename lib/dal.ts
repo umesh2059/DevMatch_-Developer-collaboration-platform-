@@ -1,7 +1,7 @@
 import "server-only";
 
 import { cache } from "react";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getSessionPayload } from "@/lib/session";
 
@@ -35,6 +35,7 @@ export const getCurrentUser = cache(async () => {
       name: true,
       email: true,
       bio: true,
+      role: true,
       createdAt: true,
       skills: {
         select: {
@@ -54,4 +55,25 @@ export async function requireCurrentUser() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
   return user;
+}
+
+/** Like requireCurrentUser but 404s (instead of revealing the route exists) for non-admins. Use in pages. */
+export async function requireAdmin() {
+  const user = await requireCurrentUser();
+  if (user.role !== "ADMIN") notFound();
+  return user;
+}
+
+/**
+ * Server Action counterpart to requireAdmin(): throws instead of calling
+ * notFound(), matching how other actions (e.g. requireTeamMembership)
+ * signal authorization failures outside of a page render.
+ */
+export async function requireAdminSession() {
+  const { userId } = await verifySession();
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true, role: true } });
+  if (!user || user.role !== "ADMIN") {
+    throw new Error("Not authorized.");
+  }
+  return { userId: user.id };
 }

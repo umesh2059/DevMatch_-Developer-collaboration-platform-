@@ -21,19 +21,28 @@ export async function createTaskAction(
     title: formData.get("title"),
     description: formData.get("description") ?? undefined,
     assigneeId: formData.get("assigneeId") || undefined,
+    priority: formData.get("priority") || undefined,
+    dueDate: formData.get("dueDate") ?? undefined,
   });
   if (!validated.success) {
     return { errors: validated.error.flatten().fieldErrors };
   }
 
-  const { title, description, assigneeId } = validated.data;
+  const { title, description, assigneeId, priority, dueDate } = validated.data;
 
   if (assigneeId) {
     await requireTeamMembership(teamId, assigneeId);
   }
 
   await prisma.task.create({
-    data: { teamId, title, description: description || null, assigneeId: assigneeId || null },
+    data: {
+      teamId,
+      title,
+      description: description || null,
+      assigneeId: assigneeId || null,
+      priority,
+      dueDate: dueDate ? new Date(dueDate) : null,
+    },
   });
 
   revalidatePath(`/teams/${teamId}`);
