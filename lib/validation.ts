@@ -46,6 +46,18 @@ export const TaskSchema = z.object({
   assigneeId: z.string().optional(),
 });
 
+export const ChatRequestSchema = z.object({
+  messages: z
+    .array(
+      z.object({
+        role: z.enum(["user", "assistant"]),
+        content: z.string().trim().min(1).max(4000),
+      }),
+    )
+    .min(1)
+    .max(20),
+});
+
 /** Splits a comma-separated skills string into a clean, deduped list of names. */
 export function parseSkillList(raw: string): string[] {
   return parseSkillLevels(raw).map((s) => s.name);
