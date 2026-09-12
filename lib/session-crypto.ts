@@ -21,7 +21,6 @@ function getSecretKey() {
 export type SessionPayload = {
   userId: string;
 };
-
 export async function encryptSession(payload: SessionPayload) {
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
