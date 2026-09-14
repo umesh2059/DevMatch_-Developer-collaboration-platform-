@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requireCurrentUser } from "@/lib/dal";
 import { getProjectMatchesForUser } from "@/lib/matching";
+import { Avatar } from "@/components/avatar";
 
 export const dynamic = "force-dynamic";
 
@@ -41,7 +42,10 @@ export default async function MatchesPage() {
               <h2 className="font-medium">{project.title}</h2>
               <span className="badge">{score}% match</span>
             </div>
-            <p className="mt-1 text-sm text-zinc-500">by {project.owner.name}</p>
+            <p className="mt-1 flex items-center gap-1.5 text-sm text-zinc-500">
+              <Avatar name={project.owner.name} avatarUrl={project.owner.avatarUrl} size={18} />
+              by {project.owner.name}
+            </p>
             <p className="mt-2 line-clamp-2 text-sm text-zinc-600 dark:text-zinc-400">
               {project.description}
             </p>

@@ -4,6 +4,7 @@ import { requireCurrentUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { TaskBoard } from "@/components/teams/task-board";
 import { Chat } from "@/components/teams/chat";
+import { Avatar } from "@/components/avatar";
 
 export const dynamic = "force-dynamic";
 
@@ -16,7 +17,7 @@ export default async function TeamWorkspacePage({ params }: PageProps<"/teams/[i
     include: {
       project: { select: { id: true, title: true, description: true } },
       members: {
-        include: { user: { select: { id: true, name: true } } },
+        include: { user: { select: { id: true, name: true, avatarUrl: true } } },
         orderBy: { joinedAt: "asc" },
       },
       tasks: {
@@ -35,7 +36,7 @@ export default async function TeamWorkspacePage({ params }: PageProps<"/teams/[i
     where: { teamId: team.id },
     orderBy: { createdAt: "asc" },
     take: 100,
-    include: { sender: { select: { id: true, name: true } } },
+    include: { sender: { select: { id: true, name: true, avatarUrl: true } } },
   });
 
   return (
@@ -47,7 +48,8 @@ export default async function TeamWorkspacePage({ params }: PageProps<"/teams/[i
 
       <div className="mt-3 flex flex-wrap gap-1.5">
         {team.members.map((m) => (
-          <span key={m.userId} className="badge">
+          <span key={m.userId} className="badge flex items-center gap-1.5">
+            <Avatar name={m.user.name} avatarUrl={m.user.avatarUrl} size={16} />
             {m.user.name}
             {m.role === "OWNER" ? " (owner)" : ""}
           </span>

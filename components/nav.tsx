@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getCurrentUser } from "@/lib/dal";
 import { logoutAction } from "@/app/actions/auth";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Avatar } from "@/components/avatar";
 import { prisma } from "@/lib/prisma";
 
 function NotificationBadge({ count }: { count: number }) {
@@ -49,11 +50,16 @@ export async function Nav() {
           ))}
           <ThemeToggle />
           {user ? (
-            <form action={logoutAction}>
-              <button type="submit" className="btn-secondary !px-3 !py-1.5">
-                Log out
-              </button>
-            </form>
+            <>
+              <Link href="/profile" aria-label="Your profile">
+                <Avatar name={user.name} avatarUrl={user.avatarUrl} size={28} />
+              </Link>
+              <form action={logoutAction}>
+                <button type="submit" className="btn-secondary !px-3 !py-1.5">
+                  Log out
+                </button>
+              </form>
+            </>
           ) : (
             <Link href="/register" className="btn-primary !px-3 !py-1.5">
               Sign up

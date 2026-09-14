@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { Avatar } from "@/components/avatar";
 
 // Reads searchParams and always needs fresh listings, so skip static
 // prerendering (this project doesn't enable Cache Components).
@@ -29,7 +30,7 @@ export default async function ProjectsPage({
       id: true,
       title: true,
       description: true,
-      owner: { select: { name: true } },
+      owner: { select: { name: true, avatarUrl: true } },
       skills: { select: { skill: { select: { name: true } } } },
     },
     take: 50,
@@ -61,7 +62,10 @@ export default async function ProjectsPage({
         {projects.map((project) => (
           <Link key={project.id} href={`/projects/${project.id}`} className="card hover:border-indigo-400">
             <h2 className="font-medium">{project.title}</h2>
-            <p className="mt-1 text-sm text-zinc-500">by {project.owner.name}</p>
+            <p className="mt-1 flex items-center gap-1.5 text-sm text-zinc-500">
+              <Avatar name={project.owner.name} avatarUrl={project.owner.avatarUrl} size={18} />
+              by {project.owner.name}
+            </p>
             <p className="mt-2 line-clamp-2 text-sm text-zinc-600 dark:text-zinc-400">
               {project.description}
             </p>

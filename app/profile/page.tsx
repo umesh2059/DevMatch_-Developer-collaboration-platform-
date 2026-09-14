@@ -14,7 +14,12 @@ export default async function ProfilePage() {
     <div className="mx-auto max-w-lg px-6 py-12">
       <h1 className="text-2xl font-semibold">Your profile</h1>
       <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{user.email}</p>
-      <ProfileForm name={user.name} bio={user.bio ?? ""} skillsValue={skillsValue} />
+      <ProfileForm
+        name={user.name}
+        bio={user.bio ?? ""}
+        skillsValue={skillsValue}
+        avatarUrl={user.avatarUrl}
+      />
     </div>
   );
 }

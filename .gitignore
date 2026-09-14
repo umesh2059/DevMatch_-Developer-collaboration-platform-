@@ -37,6 +37,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# user-uploaded files (avatars, etc.) - not part of the repo
+/public/uploads
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

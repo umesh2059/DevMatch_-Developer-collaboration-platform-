@@ -42,7 +42,7 @@ export type ProjectMatch = {
     title: string;
     description: string;
     status: string;
-    owner: { id: string; name: string };
+    owner: { id: string; name: string; avatarUrl: string | null };
     skills: { skill: { id: string; name: string } }[];
   };
   score: number;
@@ -74,7 +74,7 @@ export async function getProjectMatchesForUser(
         title: true,
         description: true,
         status: true,
-        owner: { select: { id: true, name: true } },
+        owner: { select: { id: true, name: true, avatarUrl: true } },
         skills: { select: { skill: { select: { id: true, name: true } } } },
       },
     }),
@@ -103,7 +103,7 @@ export async function getProjectMatchesForUser(
 }
 
 export type CandidateMatch = {
-  user: { id: string; name: string; bio: string | null };
+  user: { id: string; name: string; bio: string | null; avatarUrl: string | null };
   score: number;
   matchedSkills: string[];
 };
@@ -146,6 +146,7 @@ export async function getCandidatesForProject(
       id: true,
       name: true,
       bio: true,
+      avatarUrl: true,
       skills: {
         select: { skillId: true, level: true, skill: { select: { name: true } } },
       },
@@ -164,7 +165,11 @@ export async function getCandidatesForProject(
       const matchedSkills = candidateSkills
         .filter((s) => requiredIds.includes(s.skillId))
         .map((s) => s.name);
-      return { user: { id: user.id, name: user.name, bio: user.bio }, score, matchedSkills };
+      return {
+        user: { id: user.id, name: user.name, bio: user.bio, avatarUrl: user.avatarUrl },
+        score,
+        matchedSkills,
+      };
     })
     .filter((m) => m.score > 0)
     .sort((a, b) => b.score - a.score)

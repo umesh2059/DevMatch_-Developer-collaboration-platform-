@@ -233,8 +233,12 @@ Scoped out to keep this a coherent, working MVP rather than a half-finished
 sprawl:
 
 - Email verification, password reset, OAuth/social login
-- Notifications (in-app or email) for new requests/messages
-- File/image uploads (avatars, project images)
+- Notifications (in-app or email) for new requests/messages, beyond the
+  pending-request count badge in the nav
+- File/image uploads beyond user avatars (project images, etc.) - avatars are
+  stored on local disk under `public/uploads/avatars`, which won't survive a
+  serverless/read-only-filesystem deployment; swap `lib/avatar.ts` for
+  object storage (S3, R2, etc.) before deploying there
 - Pagination on `/projects` and `/matches` (currently capped at 50/20 results)
 - Rate limiting on auth endpoints
 - Automated tests

@@ -6,7 +6,7 @@ export type ChatMessagePayload = {
   teamId: string;
   content: string;
   createdAt: string;
-  sender: { id: string; name: string };
+  sender: { id: string; name: string; avatarUrl: string | null };
 };
 
 export type ClientToServerEvents = {

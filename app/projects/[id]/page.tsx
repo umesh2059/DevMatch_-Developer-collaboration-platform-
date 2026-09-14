@@ -6,6 +6,7 @@ import { getCandidatesForProject } from "@/lib/matching";
 import { JoinForm } from "./join-form";
 import { RespondButtons } from "./respond-buttons";
 import { ReportProjectForm } from "./report-form";
+import { Avatar } from "@/components/avatar";
 
 export const dynamic = "force-dynamic";
 
@@ -16,11 +17,11 @@ export default async function ProjectDetailPage({ params }: PageProps<"/projects
   const project = await prisma.project.findUnique({
     where: { id },
     include: {
-      owner: { select: { id: true, name: true } },
+      owner: { select: { id: true, name: true, avatarUrl: true } },
       skills: { select: { skill: { select: { id: true, name: true } } } },
       requests: {
         orderBy: { createdAt: "desc" },
-        include: { requester: { select: { id: true, name: true, bio: true } } },
+        include: { requester: { select: { id: true, name: true, bio: true, avatarUrl: true } } },
       },
       team: { select: { id: true, members: { select: { userId: true } } } },
     },
@@ -41,7 +42,8 @@ export default async function ProjectDetailPage({ params }: PageProps<"/projects
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold">{project.title}</h1>
-          <p className="mt-1 text-sm text-zinc-500">
+          <p className="mt-1 flex items-center gap-1.5 text-sm text-zinc-500">
+            <Avatar name={project.owner.name} avatarUrl={project.owner.avatarUrl} size={18} />
             by {project.owner.name} &middot; {project.status.replace("_", " ").toLowerCase()}
           </p>
         </div>
@@ -104,7 +106,10 @@ export default async function ProjectDetailPage({ params }: PageProps<"/projects
               {project.requests.map((r) => (
                 <div key={r.id} className="card">
                   <div className="flex items-center justify-between">
-                    <span className="font-medium">{r.requester.name}</span>
+                    <span className="flex items-center gap-2 font-medium">
+                      <Avatar name={r.requester.name} avatarUrl={r.requester.avatarUrl} size={22} />
+                      {r.requester.name}
+                    </span>
                     {r.status === "PENDING" ? (
                       <RespondButtons requestId={r.id} />
                     ) : (
@@ -131,7 +136,10 @@ export default async function ProjectDetailPage({ params }: PageProps<"/projects
               {candidates.map((c) => (
                 <div key={c.user.id} className="card">
                   <div className="flex items-center justify-between">
-                    <span className="font-medium">{c.user.name}</span>
+                    <span className="flex items-center gap-2 font-medium">
+                      <Avatar name={c.user.name} avatarUrl={c.user.avatarUrl} size={22} />
+                      {c.user.name}
+                    </span>
                     <span className="badge">{c.score}% match</span>
                   </div>
                   {c.user.bio && (

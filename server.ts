@@ -73,7 +73,7 @@ app.prepare().then(() => {
 
       const message = await prisma.message.create({
         data: { teamId, senderId: userId, content: trimmed },
-        include: { sender: { select: { id: true, name: true } } },
+        include: { sender: { select: { id: true, name: true, avatarUrl: true } } },
       });
 
       io.to(`team:${teamId}`).emit("chat:message", {

@@ -8,6 +8,7 @@ import type {
   ServerToClientEvents,
 } from "@/lib/socket-events";
 import { reportMessageAction } from "@/app/actions/reports";
+import { Avatar } from "@/components/avatar";
 
 type Props = {
   teamId: string;
@@ -84,49 +85,52 @@ export function Chat({ teamId, currentUserId, initialMessages }: Props) {
         {messages.map((m) => {
           const isOwn = m.sender.id === currentUserId;
           return (
-            <div key={m.id} className={isOwn ? "text-right" : ""}>
-              <p className="text-xs text-zinc-500">
-                {isOwn ? "You" : m.sender.name}
-                {!isOwn && (
-                  <button
-                    type="button"
-                    onClick={() => setReportingId(reportingId === m.id ? null : m.id)}
-                    className="ml-2 text-zinc-400 hover:text-red-500"
-                  >
-                    Report
-                  </button>
-                )}
-              </p>
-              <p className="inline-block max-w-[85%] rounded-md bg-zinc-100 px-3 py-1.5 text-sm dark:bg-zinc-800">
-                {m.content}
-              </p>
-              {reportingId === m.id && (
-                <div className="mt-1 flex flex-col items-end gap-1.5">
-                  <input
-                    value={reportReason}
-                    onChange={(e) => setReportReason(e.target.value)}
-                    placeholder="Why report this message?"
-                    className="input !py-1 text-xs"
-                  />
-                  <div className="flex gap-1.5">
+            <div key={m.id} className={`flex items-end gap-2 ${isOwn ? "flex-row-reverse text-right" : ""}`}>
+              <Avatar name={m.sender.name} avatarUrl={m.sender.avatarUrl} size={24} />
+              <div className="min-w-0">
+                <p className="text-xs text-zinc-500">
+                  {isOwn ? "You" : m.sender.name}
+                  {!isOwn && (
                     <button
                       type="button"
-                      disabled={isReporting || reportReason.trim().length < 3}
-                      onClick={() => submitReport(m.id)}
-                      className="btn-secondary !px-2 !py-1 text-xs text-red-600"
+                      onClick={() => setReportingId(reportingId === m.id ? null : m.id)}
+                      className="ml-2 text-zinc-400 hover:text-red-500"
                     >
-                      Submit
+                      Report
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => setReportingId(null)}
-                      className="btn-secondary !px-2 !py-1 text-xs"
-                    >
-                      Cancel
-                    </button>
+                  )}
+                </p>
+                <p className="inline-block max-w-[85%] rounded-md bg-zinc-100 px-3 py-1.5 text-sm dark:bg-zinc-800">
+                  {m.content}
+                </p>
+                {reportingId === m.id && (
+                  <div className="mt-1 flex flex-col items-end gap-1.5">
+                    <input
+                      value={reportReason}
+                      onChange={(e) => setReportReason(e.target.value)}
+                      placeholder="Why report this message?"
+                      className="input !py-1 text-xs"
+                    />
+                    <div className="flex gap-1.5">
+                      <button
+                        type="button"
+                        disabled={isReporting || reportReason.trim().length < 3}
+                        onClick={() => submitReport(m.id)}
+                        className="btn-secondary !px-2 !py-1 text-xs text-red-600"
+                      >
+                        Submit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setReportingId(null)}
+                        className="btn-secondary !px-2 !py-1 text-xs"
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           );
         })}
