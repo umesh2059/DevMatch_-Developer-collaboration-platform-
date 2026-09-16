@@ -18,7 +18,6 @@ enum ProjectStatus {
   COMPLETED
   ARCHIVED
 }
-
 enum RequestStatus {
   PENDING
   ACCEPTED

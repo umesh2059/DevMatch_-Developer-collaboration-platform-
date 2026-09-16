@@ -40,20 +40,26 @@ app.prepare().then(() => {
     path: "/socket.io",
   });
 
-  io.on("connection", async (socket) => {
+  io.on("connection", (socket) => {
+    // Listeners must be attached synchronously, before any `await`: Socket.IO
+    // does not buffer client events for handlers that aren't registered yet,
+    // so a "team:join" the browser fires immediately on connect can otherwise
+    // arrive before this resolves and get silently dropped.
     const cookies = parseCookieHeader(socket.handshake.headers.cookie);
-    const session = await decryptSession(cookies[SESSION_COOKIE]);
-
-    if (!session?.userId) {
-      socket.emit("chat:error", "Not authenticated.");
-      socket.disconnect(true);
-      return;
-    }
-    const userId = session.userId;
+    const sessionPromise = decryptSession(cookies[SESSION_COOKIE]).then((session) => {
+      if (!session?.userId) {
+        socket.emit("chat:error", "Not authenticated.");
+        socket.disconnect(true);
+      }
+      return session;
+    });
 
     socket.on("team:join", async (teamId) => {
+      const session = await sessionPromise;
+      if (!session?.userId) return;
+
       try {
-        await requireTeamMembership(teamId, userId);
+        await requireTeamMembership(teamId, session.userId);
         socket.join(`team:${teamId}`);
       } catch {
         socket.emit("chat:error", "You are not a member of this team.");
@@ -61,18 +67,21 @@ app.prepare().then(() => {
     });
 
     socket.on("chat:send", async ({ teamId, content }) => {
+      const session = await sessionPromise;
+      if (!session?.userId) return;
+
       const trimmed = content.trim().slice(0, 2000);
       if (!trimmed) return;
 
       try {
-        await requireTeamMembership(teamId, userId);
+        await requireTeamMembership(teamId, session.userId);
       } catch {
         socket.emit("chat:error", "You are not a member of this team.");
         return;
       }
 
       const message = await prisma.message.create({
-        data: { teamId, senderId: userId, content: trimmed },
+        data: { teamId, senderId: session.userId, content: trimmed },
         include: { sender: { select: { id: true, name: true, avatarUrl: true } } },
       });
 
