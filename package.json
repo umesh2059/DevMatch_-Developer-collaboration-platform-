@@ -2,9 +2,17 @@
   "name": "devmatch",
   "version": "0.1.0",
   "private": true,
+  "allowScripts": {
+    "@prisma/engines@7.10.0": true,
+    "esbuild@0.28.2": true,
+    "fsevents@2.3.3": true,
+    "prisma@7.10.0": true,
+    "unrs-resolver@1.12.2": true
+  },
   "scripts": {
     "dev": "cross-env NODE_ENV=development node --env-file=.env --import tsx server.ts",
     "build": "next build",
+    "postinstall": "prisma generate",
     "start": "cross-env NODE_ENV=production node --env-file=.env --import tsx server.ts",
     "lint": "eslint",
     "db:generate": "prisma generate",
