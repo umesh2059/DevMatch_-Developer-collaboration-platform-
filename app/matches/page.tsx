@@ -36,7 +36,7 @@ export default async function MatchesPage() {
           <Link
             key={project.id}
             href={`/projects/${project.id}`}
-            className="card block hover:border-indigo-400"
+            className="card block transition-all hover:-translate-y-0.5 hover:border-indigo-400 hover:shadow-md"
           >
             <div className="flex items-center justify-between">
               <h2 className="font-medium">{project.title}</h2>

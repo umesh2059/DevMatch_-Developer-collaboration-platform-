@@ -57,7 +57,7 @@ export default async function DashboardPage() {
               <Link
                 key={project.id}
                 href={`/projects/${project.id}`}
-                className="card block hover:border-indigo-400"
+                className="card block transition-all hover:-translate-y-0.5 hover:border-indigo-400 hover:shadow-md"
               >
                 <div className="flex items-center justify-between">
                   <span className="font-medium">{project.title}</span>
@@ -86,7 +86,7 @@ export default async function DashboardPage() {
               <Link
                 key={m.team.id}
                 href={`/teams/${m.team.id}`}
-                className="card block hover:border-indigo-400"
+                className="card block transition-all hover:-translate-y-0.5 hover:border-indigo-400 hover:shadow-md"
               >
                 <span className="font-medium">{m.team.project.title}</span>
               </Link>
@@ -102,7 +102,7 @@ export default async function DashboardPage() {
               <Link
                 key={r.id}
                 href={`/projects/${r.project.id}`}
-                className="card block hover:border-indigo-400"
+                className="card block transition-all hover:-translate-y-0.5 hover:border-indigo-400 hover:shadow-md"
               >
                 <span className="font-medium">{r.project.title}</span>
                 <span className="ml-2 badge">Pending</span>

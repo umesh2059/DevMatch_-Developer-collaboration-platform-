@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
-import { AdminUserRow } from "./user-row";
+import { AdminUserRow, AdminUserCard } from "./user-row";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +30,8 @@ export default async function AdminUsersPage() {
         {users.length} registered user{users.length === 1 ? "" : "s"}.
       </p>
 
-      <div className="mt-6 overflow-x-auto">
+      {/* Table on sm+ screens; stacked cards below that avoid horizontal scrolling */}
+      <div className="mt-6 hidden overflow-x-auto sm:block">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-zinc-200 text-left text-zinc-500 dark:border-zinc-800">
@@ -49,6 +50,12 @@ export default async function AdminUsersPage() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      <div className="mt-6 space-y-3 sm:hidden">
+        {users.map((u) => (
+          <AdminUserCard key={u.id} user={u} isSelf={u.id === admin.id} />
+        ))}
       </div>
     </div>
   );

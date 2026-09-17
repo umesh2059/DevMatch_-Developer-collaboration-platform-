@@ -60,7 +60,7 @@ export default async function ProjectsPage({
           <p className="text-sm text-zinc-500">No open projects match yet.</p>
         )}
         {projects.map((project) => (
-          <Link key={project.id} href={`/projects/${project.id}`} className="card hover:border-indigo-400">
+          <Link key={project.id} href={`/projects/${project.id}`} className="card transition-all hover:-translate-y-0.5 hover:border-indigo-400 hover:shadow-md">
             <h2 className="font-medium">{project.title}</h2>
             <p className="mt-1 flex items-center gap-1.5 text-sm text-zinc-500">
               <Avatar name={project.owner.name} avatarUrl={project.owner.avatarUrl} size={18} />
