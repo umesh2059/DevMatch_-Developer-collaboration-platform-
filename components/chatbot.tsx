@@ -58,7 +58,7 @@ export function Chatbot() {
   return (
     <div className="fixed inset-x-4 bottom-5 z-50 flex h-[min(28rem,70vh)] flex-col overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-xl dark:border-zinc-800 dark:bg-zinc-900 sm:inset-x-auto sm:right-5 sm:w-96">
       <div className="flex items-center justify-between border-b border-zinc-200 px-4 py-2 dark:border-zinc-800">
-        <span className="text-sm font-medium">DevMatch Assistant</span>
+        <span className="text-sm font-medium">DevMatch Assistants</span>
         <button
           type="button"
           onClick={() => setOpen(false)}
@@ -71,7 +71,7 @@ export function Chatbot() {
 
       <div ref={listRef} className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
         {messages.length === 0 && (
-          <p className="text-sm text-zinc-500">Ask me anything — about DevMatch or anything else.</p>
+          <p className="text-sm text-zinc-500">Ask me anythings — about DevMatch or anything else.</p>
         )}
         {messages.map((m, i) => (
           <div key={i} className={m.role === "user" ? "text-right" : ""}>
