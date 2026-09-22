@@ -87,7 +87,7 @@ export function Chatbot() {
             </p>
           </div>
         ))}
-        {sending && <p className="text-sm text-zinc-500">Thinking…</p>}
+        {sending && <p className="text-sm text-zinc-500">Thinking....</p>}
       </div>
 
       {error && <p className="px-4 text-xs text-red-600">{error}</p>}
