@@ -72,10 +72,16 @@ export function Chat({ teamId, currentUserId, initialMessages }: Props) {
   }
 
   return (
-    <div className="card flex h-[28rem] flex-col p-0">
-      <div className="flex items-center justify-between border-b border-zinc-200 px-4 py-2 dark:border-zinc-800">
+    <div className="card flex h-[75vh] max-h-[34rem] min-h-[22rem] flex-col p-0 sm:h-[28rem] sm:max-h-none">
+      <div className="flex items-center justify-between border-b border-zinc-200 px-4 py-2.5 dark:border-zinc-800">
         <span className="text-sm font-medium">Team chat</span>
-        <span className={`h-2 w-2 rounded-full ${connected ? "bg-green-500" : "bg-zinc-400"}`} />
+        <span className="flex items-center gap-1.5 text-xs text-zinc-500">
+          <span
+            className={`h-2 w-2 rounded-full ${connected ? "bg-green-500" : "bg-zinc-400"}`}
+            aria-hidden="true"
+          />
+          {connected ? "Live" : "Connecting…"}
+        </span>
       </div>
 
       <div ref={listRef} className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
@@ -87,7 +93,7 @@ export function Chat({ teamId, currentUserId, initialMessages }: Props) {
           return (
             <div key={m.id} className={`flex items-end gap-2 ${isOwn ? "flex-row-reverse text-right" : ""}`}>
               <Avatar name={m.sender.name} avatarUrl={m.sender.avatarUrl} size={24} />
-              <div className="min-w-0">
+              <div className="min-w-0 max-w-[85%]">
                 <p className="text-xs text-zinc-500">
                   {isOwn ? "You" : m.sender.name}
                   {!isOwn && (
@@ -100,7 +106,13 @@ export function Chat({ teamId, currentUserId, initialMessages }: Props) {
                     </button>
                   )}
                 </p>
-                <p className="inline-block max-w-[85%] rounded-md bg-zinc-100 px-3 py-1.5 text-sm dark:bg-zinc-800">
+                <p
+                  className={`mt-0.5 inline-block break-words rounded-2xl px-3 py-1.5 text-sm ${
+                    isOwn
+                      ? "rounded-br-sm bg-indigo-600 text-white"
+                      : "rounded-bl-sm bg-zinc-100 dark:bg-zinc-800"
+                  }`}
+                >
                   {m.content}
                 </p>
                 {reportingId === m.id && (

@@ -7,7 +7,7 @@ export function RespondButtons({ requestId }: { requestId: string }) {
   const [isPending, startTransition] = useTransition();
 
   return (
-    <div className="flex gap-2">
+    <div className="flex flex-wrap gap-2">
       <button
         type="button"
         disabled={isPending}
@@ -20,7 +20,7 @@ export function RespondButtons({ requestId }: { requestId: string }) {
         type="button"
         disabled={isPending}
         onClick={() => startTransition(() => respondToRequestAction(requestId, "DECLINED"))}
-        className="btn-secondary !px-3 !py-1.5"
+        className="btn-secondary !px-3 !py-1.5 text-red-600 dark:text-red-400"
       >
         Decline
       </button>

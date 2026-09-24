@@ -10,6 +10,29 @@ import { Avatar } from "@/components/avatar";
 
 export const dynamic = "force-dynamic";
 
+const REQUEST_STATUS_STYLES: Record<string, string> = {
+  PENDING: "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300",
+  ACCEPTED: "bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-300",
+  DECLINED: "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400",
+};
+
+const PROJECT_STATUS_STYLES: Record<string, string> = {
+  OPEN: "bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-300",
+  IN_PROGRESS: "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300",
+  COMPLETED: "bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300",
+  ARCHIVED: "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400",
+};
+
+function StatusBadge({ status, styles }: { status: string; styles: Record<string, string> }) {
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${styles[status] ?? "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400"}`}
+    >
+      {status.replace("_", " ").toLowerCase()}
+    </span>
+  );
+}
+
 export default async function ProjectDetailPage({ params }: PageProps<"/projects/[id]">) {
   const { id } = await params;
   const user = await getCurrentUser();
@@ -39,16 +62,19 @@ export default async function ProjectDetailPage({ params }: PageProps<"/projects
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold">{project.title}</h1>
-          <p className="mt-1 flex items-center gap-1.5 text-sm text-zinc-500">
-            <Avatar name={project.owner.name} avatarUrl={project.owner.avatarUrl} size={18} />
-            by {project.owner.name} &middot; {project.status.replace("_", " ").toLowerCase()}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="text-2xl font-semibold break-words">{project.title}</h1>
+          <p className="mt-1.5 flex flex-wrap items-center gap-2 text-sm text-zinc-500">
+            <span className="flex items-center gap-1.5">
+              <Avatar name={project.owner.name} avatarUrl={project.owner.avatarUrl} size={18} />
+              by {project.owner.name}
+            </span>
+            <StatusBadge status={project.status} styles={PROJECT_STATUS_STYLES} />
           </p>
         </div>
         {project.team && (isOwner || isMember) && (
-          <Link href={`/teams/${project.team.id}`} className="btn-secondary shrink-0">
+          <Link href={`/teams/${project.team.id}`} className="btn-secondary w-full shrink-0 sm:w-auto">
             Open workspace
           </Link>
         )}
@@ -80,8 +106,8 @@ export default async function ProjectDetailPage({ params }: PageProps<"/projects
             <p className="text-sm text-green-600">You&apos;re already on this team.</p>
           )}
           {user && !isMember && myRequest && (
-            <p className="text-sm text-zinc-500">
-              Your request is <span className="badge">{myRequest.status}</span>
+            <p className="flex flex-wrap items-center gap-2 text-sm text-zinc-500">
+              Your request is <StatusBadge status={myRequest.status} styles={REQUEST_STATUS_STYLES} />
             </p>
           )}
           {user && !isMember && !myRequest && project.status === "OPEN" && (
@@ -104,8 +130,8 @@ export default async function ProjectDetailPage({ params }: PageProps<"/projects
                 <p className="text-sm text-zinc-500">No requests yet.</p>
               )}
               {project.requests.map((r) => (
-                <div key={r.id} className="card">
-                  <div className="flex items-center justify-between">
+                <div key={r.id} className="card transition-shadow hover:shadow-md">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
                     <span className="flex items-center gap-2 font-medium">
                       <Avatar name={r.requester.name} avatarUrl={r.requester.avatarUrl} size={22} />
                       {r.requester.name}
@@ -113,7 +139,7 @@ export default async function ProjectDetailPage({ params }: PageProps<"/projects
                     {r.status === "PENDING" ? (
                       <RespondButtons requestId={r.id} />
                     ) : (
-                      <span className="badge">{r.status}</span>
+                      <StatusBadge status={r.status} styles={REQUEST_STATUS_STYLES} />
                     )}
                   </div>
                   {r.message && (
@@ -134,8 +160,8 @@ export default async function ProjectDetailPage({ params }: PageProps<"/projects
                 <p className="text-sm text-zinc-500">No matches yet.</p>
               )}
               {candidates.map((c) => (
-                <div key={c.user.id} className="card">
-                  <div className="flex items-center justify-between">
+                <div key={c.user.id} className="card transition-shadow hover:shadow-md">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="flex items-center gap-2 font-medium">
                       <Avatar name={c.user.name} avatarUrl={c.user.avatarUrl} size={22} />
                       {c.user.name}
